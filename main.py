@@ -21,9 +21,13 @@ def main_func(filepath: str):
     list_group_name = []
     listVariableName = []
     listColumnParameters = []
+    list_column_groups = []
     count = 0
     tstCount = 0
     group_name = ""
+
+    group_var_names = []
+    print("---------------------------------------------------------------")
     for item in data:
         tstCount += 1
         group_name = item['groupname']
@@ -31,19 +35,31 @@ def main_func(filepath: str):
         variable_data = item['variabledata']
 
         if group_name not in list_group_name:
-            count += 1
             list_group_name.append(group_name)
+            group_var_names.append([])
+            list_column_groups.append([])
 
-        if variable_name not in listVariableName:
-            count += 1
+        index_group = list_group_name.index(group_name)
+
+        if variable_name not in group_var_names[index_group]:
+            group_var_names[index_group].append(variable_name)
             listVariableName.append(variable_name)
-            listColumnParameters.append([])
+            list_column_groups[index_group].append([])
 
         index = listVariableName.index(variable_name)
-        listColumnParameters[index].extend(variable_data)
+        list_column_groups[index_group][index].extend(variable_data)
 
-    print(list_group_name)
-    print(listVariableName)
+    for item in group_var_names:
+        print(item)
+
+    count_groups = 0
+    for item in list_column_groups:
+        count_groups += 1
+        print(count_groups)
+        for jitem in item:
+            print(jitem)
+
+    print("---------------------------------------------------------------")
     st.insert(END, f"stcm распарсен.\n")
     # for item in listColumnParameters:
     #     print(item)
@@ -86,15 +102,15 @@ def main_func(filepath: str):
         st.insert(END, f"{round(counter_load)}% {load_string}\n")
 
         file_name = listVariableName[i].replace(".", "_").strip()
-        with open(f'{dir_name}\\{file_name}.csv', 'w') as file_out:
-            file_out.write(f"Time; {listVariableName[i]} \n")
-            # print(listColumnParameters[i])
-            for item in listColumnParameters[i]:
-                time = item['x']
-                val = item['y']
-                string_out = f"{time};{val}\n"
-                file_out.write(string_out)
-    st.insert(END, f"Конвертация выполнена успешно\n")
+    #     with open(f'{dir_name}\\{file_name}.csv', 'w') as file_out:
+    #         file_out.write(f"Time; {listVariableName[i]} \n")
+    #         # print(listColumnParameters[i])
+    #         for item in listColumnParameters[i]:
+    #             time = item['x']
+    #             val = item['y']
+    #             string_out = f"{time};{val}\n"
+    #             file_out.write(string_out)
+    # st.insert(END, f"Конвертация выполнена успешно\n")
 
 
 root = Tk()
