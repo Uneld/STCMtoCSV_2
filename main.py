@@ -19,12 +19,10 @@ def main_func(filepath: str):
     st.insert(END, f"Данные загружены.\n")
 
     list_group_name = []
-    list_variable_name = []
+    group_var_names = []
     list_column_groups = []
     tst_count = 0
     group_name = ""
-
-    group_var_names = []
 
     for item in data:
         tst_count += 1
@@ -44,11 +42,10 @@ def main_func(filepath: str):
         # Добавляем имя переменной в список, если оно еще не существует в группе
         if variable_name not in group_var_names[index_group]:
             group_var_names[index_group].append(variable_name)
-            list_variable_name.append(variable_name)
             list_column_groups[index_group].append([])
 
         # Получаем индекс переменной в списке
-        index = list_variable_name.index(variable_name)
+        index = group_var_names[index_group].index(variable_name)
 
         # Расширяем данные переменной до соответствующей группы столбцов
         list_column_groups[index_group][index].extend(variable_data)
@@ -65,8 +62,6 @@ def main_func(filepath: str):
 
     print("---------------------------------------------------------------")
     st.insert(END, f"stcm распарсен.\n")
-    # for item in listColumnParameters:
-    #     print(item)
 
     find_log_substr = filepath.find("Log_")
     log_substr = filepath[find_log_substr:]
@@ -88,33 +83,41 @@ def main_func(filepath: str):
     dir_name = f"{filepath_out}\\{dir_name}"
     if not os.path.isdir(dir_name):
         os.mkdir(dir_name)
+    len_group_name = len(list_group_name)
 
-    len_variable_name = len(list_variable_name)
-    st.insert(END, f"Запись файлов {len_variable_name} шт.\n")
-    st.insert(END, f"Запись файлов.\n")
+    max_len_name_groups = 0;
+    for g in range(len_group_name):
+        group_text = f"Запись группы {list_group_name[g]}."
 
-    step = 100 / len_variable_name
-    counter_load = 0
-    load_string = ""
-    for i in range(len_variable_name):
-        counter_load += step
-        if counter_load > 100:
-            counter_load = 100
+        if max_len_name_groups < len(group_text):
+            max_len_name_groups = len(group_text)
 
-        st.delete(4.0, 5.0)
-        load_string += "##"
-        st.insert(END, f"{round(counter_load)}% {load_string}\n")
+        step_text = g * 2
+        st.replace(f"{3 + step_text}.0", f"{3 + step_text}.{max_len_name_groups}", group_text)
+        st.insert(END, "\n")
+        len_variable_name = len(group_var_names[g])
+        step = 100 / len_variable_name
+        counter_load = 0
+        load_string = ""
+        for i in range(len_variable_name):
+            counter_load += step
+            if counter_load > 100:
+                counter_load = 100
 
-        file_name = list_variable_name[i].replace(".", "_").strip()
-    #     with open(f'{dir_name}\\{file_name}.csv', 'w') as file_out:
-    #         file_out.write(f"Time; {listVariableName[i]} \n")
-    #         # print(listColumnParameters[i])
-    #         for item in listColumnParameters[i]:
-    #             time = item['x']
-    #             val = item['y']
-    #             string_out = f"{time};{val}\n"
-    #             file_out.write(string_out)
-    # st.insert(END, f"Конвертация выполнена успешно\n")
+            load_string += "##"
+            st.replace(f"{4 + step_text}.0", f"{4 + step_text}.50", f"{round(counter_load)}% {load_string}")
+            st.insert(END, "\n")
+
+            # file_name = list_variable_name[i].replace(".", "_").strip()
+        #     with open(f'{dir_name}\\{file_name}.csv', 'w') as file_out:
+        #         file_out.write(f"Time; {listVariableName[i]} \n")
+        #         # print(listColumnParameters[i])
+        #         for item in listColumnParameters[i]:
+        #             time = item['x']
+        #             val = item['y']
+        #             string_out = f"{time};{val}\n"
+        #             file_out.write(string_out)
+        # st.insert(END, f"Конвертация выполнена успешно\n")
 
 
 root = Tk()
