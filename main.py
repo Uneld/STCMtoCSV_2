@@ -9,6 +9,8 @@ import os
 
 
 def main_func(filepath: str):
+    st.insert(END, f"Считывание фала stcm...\n")
+
     with open(filepath, 'r') as file_in:
         data_string = file_in.read()
 
@@ -50,33 +52,33 @@ def main_func(filepath: str):
         # Расширяем данные переменной до соответствующей группы столбцов
         list_column_groups[index_group][index].extend(variable_data)
 
-    for item in group_var_names:
-        print(item)
+    # for item in group_var_names:
+    #     print(item)
 
     count_groups = 0
-    for item in list_column_groups:
-        count_groups += 1
-        print(count_groups)
-        for jitem in item:
-            print(jitem)
+    # for item in list_column_groups:
+    #     count_groups += 1
+        # print(count_groups)
+        # for jitem in item:
+        #     print(jitem)/
 
-    print("---------------------------------------------------------------")
-    st.insert(END, f"stcm распарсен.\n")
+    # print("---------------------------------------------------------------")
+    st.insert(END, f".stcm распарсен.\n")
 
     find_log_substr = filepath.find("Log_")
     log_substr = filepath[find_log_substr:]
 
-    print(filepath)
+    # print(filepath)
     find_start_filename_substr = filepath.rfind("/")
-    print(find_start_filename_substr)
+    # print(find_start_filename_substr)
     filepath_out = filepath[:find_start_filename_substr].replace("/", "\\")
-    print(filepath_out)
+    # print(filepath_out)
 
     if find_log_substr > 0 and len(log_substr) > 26:  # _2023-08-03_12h40m47s.stcm длинна
         pos = log_substr.find('_', log_substr.find('_') + 1)
-        print(log_substr)
+        # print(log_substr)
         dir_name = log_substr[pos + 1: -5]
-        print(dir_name)
+        # print(dir_name)
     else:
         dir_name = group_name
 
@@ -85,15 +87,20 @@ def main_func(filepath: str):
         os.mkdir(dir_name)
     len_group_name = len(list_group_name)
 
-    max_len_name_groups = 0;
+    max_len_name_groups = 0
     for g in range(len_group_name):
-        group_text = f"Запись группы {list_group_name[g]}."
+        name_group:str = list_group_name[g]
+        group_text = f"Запись группы {name_group}."
+
+        dir_group_name = f"{dir_name}\\{ name_group.strip().replace(',', '_').replace('.', '_') }"
+        if not os.path.isdir(dir_group_name):
+            os.mkdir(dir_group_name)
 
         if max_len_name_groups < len(group_text):
             max_len_name_groups = len(group_text)
 
-        step_text = g * 2
-        st.replace(f"{3 + step_text}.0", f"{3 + step_text}.{max_len_name_groups}", group_text)
+        step_text = 4 + g * 2
+        st.replace(f"{step_text}.0", f"{step_text}.{max_len_name_groups}", group_text)
         st.insert(END, "\n")
         len_variable_name = len(group_var_names[g])
         step = 100 / len_variable_name
@@ -105,20 +112,19 @@ def main_func(filepath: str):
                 counter_load = 100
 
             load_string += "##"
-            st.replace(f"{4 + step_text}.0", f"{4 + step_text}.50", f"{round(counter_load)}% {load_string}")
+            step_text = 5 + g * 2
+            st.replace(f"{step_text}.0", f"{step_text}.30", f"{round(counter_load)}% {load_string}")
             st.insert(END, "\n")
 
-            # file_name = list_variable_name[i].replace(".", "_").strip()
-        #     with open(f'{dir_name}\\{file_name}.csv', 'w') as file_out:
-        #         file_out.write(f"Time; {listVariableName[i]} \n")
-        #         # print(listColumnParameters[i])
-        #         for item in listColumnParameters[i]:
-        #             time = item['x']
-        #             val = item['y']
-        #             string_out = f"{time};{val}\n"
-        #             file_out.write(string_out)
-        # st.insert(END, f"Конвертация выполнена успешно\n")
-
+            file_name = group_var_names[g][i].replace(".", "_").strip()
+            with open(f'{dir_group_name}\\{file_name}.csv', 'w') as file_out:
+                file_out.write(f"Time; {group_var_names[g][i]} \n")
+                # print(listColumnParameters[i])
+                for item in list_column_groups[g][i]:
+                    time = item['x']
+                    val = item['y']
+                    string_out = f"{time};{val}\n"
+                    file_out.write(string_out)
 
 root = Tk()
 root.title("GRF")
@@ -132,12 +138,12 @@ root.grid_columnconfigure(index=0, weight=1)
 def open_file():
     st.delete("1.0", END)
     filepath = filedialog.askopenfilename()
-    print("path: " + filepath)
+    # print("path: " + filepath)
     if filepath != "" and filepath.rfind(".stcm") > 0:
         threading.Thread(target=main_func, args=(filepath,)).start()
     else:
         st.insert(END, f"Не верный путь или не верный формат файла\n")
-        print("Не верный путь или не верный формат файла")
+        # print("Не верный путь или не верный формат файла")
 
 
 open_button = ttk.Button(text="Открыть файл", command=open_file)
