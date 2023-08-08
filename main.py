@@ -19,34 +19,38 @@ def main_func(filepath: str):
     st.insert(END, f"Данные загружены.\n")
 
     list_group_name = []
-    listVariableName = []
-    listColumnParameters = []
+    list_variable_name = []
     list_column_groups = []
-    count = 0
-    tstCount = 0
+    tst_count = 0
     group_name = ""
 
     group_var_names = []
-    print("---------------------------------------------------------------")
+
     for item in data:
-        tstCount += 1
+        tst_count += 1
         group_name = item['groupname']
         variable_name = item['variablename']
         variable_data = item['variabledata']
 
+        # Добавляем имя группы в список, если оно еще не существует
         if group_name not in list_group_name:
             list_group_name.append(group_name)
             group_var_names.append([])
             list_column_groups.append([])
 
+        # Получаем индекс группы в списке
         index_group = list_group_name.index(group_name)
 
+        # Добавляем имя переменной в список, если оно еще не существует в группе
         if variable_name not in group_var_names[index_group]:
             group_var_names[index_group].append(variable_name)
-            listVariableName.append(variable_name)
+            list_variable_name.append(variable_name)
             list_column_groups[index_group].append([])
 
-        index = listVariableName.index(variable_name)
+        # Получаем индекс переменной в списке
+        index = list_variable_name.index(variable_name)
+
+        # Расширяем данные переменной до соответствующей группы столбцов
         list_column_groups[index_group][index].extend(variable_data)
 
     for item in group_var_names:
@@ -85,7 +89,7 @@ def main_func(filepath: str):
     if not os.path.isdir(dir_name):
         os.mkdir(dir_name)
 
-    len_variable_name = len(listVariableName)
+    len_variable_name = len(list_variable_name)
     st.insert(END, f"Запись файлов {len_variable_name} шт.\n")
     st.insert(END, f"Запись файлов.\n")
 
@@ -101,7 +105,7 @@ def main_func(filepath: str):
         load_string += "##"
         st.insert(END, f"{round(counter_load)}% {load_string}\n")
 
-        file_name = listVariableName[i].replace(".", "_").strip()
+        file_name = list_variable_name[i].replace(".", "_").strip()
     #     with open(f'{dir_name}\\{file_name}.csv', 'w') as file_out:
     #         file_out.write(f"Time; {listVariableName[i]} \n")
     #         # print(listColumnParameters[i])
