@@ -129,7 +129,7 @@ def parse_stcm_file(filepath):
                        f"{round(counter_load)}% {load_string}")  # Заменяем текст прогресс-бара
             st.insert(END, "\n")  # Вставляем новую строку
 
-            file_name = group_var_names[g][i].replace(".", "_").strip()  # Создаем название файла для этой переменной
+            file_name = group_var_names[g][i].replace(".", "_").replace(":", "_").strip()  # Создаем название файла для этой переменной
             with open(f'{dir_group_name}\\{file_name}.csv', 'w') as file_out:  # Открываем файл для записи
                 file_out.write(f"Time; {group_var_names[g][i]} \n")  # Записываем заголовок
                 for item in list_column_groups[g][i]:  # Перебираем каждый элемент в данных переменной
